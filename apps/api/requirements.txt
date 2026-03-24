@@ -5,7 +5,7 @@ alembic==1.15.2
 psycopg2-binary==2.9.10
 pydantic==2.11.1
 pydantic-settings==2.8.1
-python-jose[cryptography]==3.5.0
+PyJWT[crypto]==2.9.0
 httpx==0.28.1
 redis==5.2.1
 python-multipart==0.0.20
