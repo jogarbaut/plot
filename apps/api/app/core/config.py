@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     @property
-    def DEBUG(self) -> bool:
+    def debug(self) -> bool:
         return self.ENVIRONMENT == "development"
 
     # Database
