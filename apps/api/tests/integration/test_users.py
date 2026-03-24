@@ -1,6 +1,7 @@
+from unittest.mock import ANY
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import ANY
 
 from app.core.auth import verify_token
 from app.core.database import get_db
