@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -7,13 +9,15 @@ from app.core.config import settings
 
 _security = HTTPBearer()
 
-# Fetches Auth0's public keys to verify JWT signatures.
-# PyJWKClient caches the keys internally — no network call on every request.
-_jwks_client = PyJWKClient(f"https://{settings.AUTH0_DOMAIN}/.well-known/jwks.json")
+
+@lru_cache
+def get_jwks_client() -> PyJWKClient:
+    return PyJWKClient(f"https://{settings.AUTH0_DOMAIN}/.well-known/jwks.json")
 
 
 def verify_token(
     credentials: HTTPAuthorizationCredentials = Depends(_security),
+    jwks_client: PyJWKClient = Depends(get_jwks_client),
 ) -> dict:
     """FastAPI dependency — verifies the Auth0 JWT and returns the decoded payload.
 
@@ -24,7 +28,7 @@ def verify_token(
     """
     token = credentials.credentials
     try:
-        signing_key = _jwks_client.get_signing_key_from_jwt(token)
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
         payload = jwt.decode(
             token,
             signing_key.key,
