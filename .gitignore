@@ -1,0 +1,31 @@
+# ─── Secrets — NEVER commit these ──────────────────────────────────────────
+.env.local
+.env.*.local
+.env
+
+# ─── Node / Next.js ────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+dist/
+.turbo/
+
+# ─── Python / FastAPI ──────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# ─── OS / Editor ───────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# ─── Misc ──────────────────────────────────────────────────────────────────
+*.log

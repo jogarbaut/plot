@@ -1,0 +1,25 @@
+# Deploys to production when code is merged into main.
+# main should only be merged into via pull request from dev — never pushed to directly.
+
+name: Deploy — Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-api-production:
+    name: Deploy API to Render (production)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          curl -X POST "${{ secrets.RENDER_PRODUCTION_DEPLOY_HOOK }}"
+
+  notify:
+    name: Production deployed
+    runs-on: ubuntu-latest
+    needs: [deploy-api-production]
+    steps:
+      - name: Log deploy
+        run: echo "Production deploy triggered for commit ${{ github.sha }}"

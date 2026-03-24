@@ -1,0 +1,73 @@
+# Runs on every pull request to dev or main.
+# Fails fast if lint, typecheck, or tests break — nothing merges broken code.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  web:
+    name: Web — Lint & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm --filter web lint
+
+      - name: Typecheck
+        run: pnpm --filter web typecheck
+
+  api:
+    name: API — Lint & Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: plot
+          POSTGRES_PASSWORD: plot
+          POSTGRES_DB: plot_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://plot:plot@localhost:5432/plot_test
+      REDIS_URL: redis://localhost:6379
+      AUTH0_DOMAIN: placeholder.auth0.com
+      AUTH0_AUDIENCE: placeholder
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r apps/api/requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check apps/api
+
+      - name: Run tests
+        run: pytest apps/api/tests --cov=apps/api/app --cov-report=term-missing

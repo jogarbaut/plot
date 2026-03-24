@@ -1,0 +1,35 @@
+# Docker Compose — local development only
+# This runs Postgres and Redis so you don't need to install them on your machine.
+# Your Next.js and FastAPI apps still run natively (not in Docker) during dev.
+#
+# Usage:
+#   docker compose up -d        → start Postgres + Redis in the background
+#   docker compose down         → stop them
+#   docker compose down -v      → stop AND delete all data (fresh start)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: plot_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: plot
+      POSTGRES_PASSWORD: plot
+      POSTGRES_DB: plot_dev
+    ports:
+      - "5432:5432"       # accessible at localhost:5432 on your machine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # data persists between restarts
+
+  redis:
+    image: redis:7-alpine
+    container_name: plot_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"       # accessible at localhost:6379 on your machine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
